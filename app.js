@@ -1,20 +1,30 @@
 const STORAGE_KEY = 'todo-list-items';
 const THEME_STORAGE_KEY = 'todo-list-theme';
+const FILTER_STORAGE_KEY = 'todo-list-filter';
 
 const form = document.getElementById('todo-form');
 const input = document.getElementById('todo-input');
 const list = document.getElementById('todo-list');
 const emptyState = document.getElementById('empty-state');
 const remainingCount = document.getElementById('remaining-count');
+const clearCompletedButton = document.getElementById('clear-completed');
 const themeToggle = document.getElementById('theme-toggle');
 const themeIcon = document.getElementById('theme-icon');
 const themeLabel = document.getElementById('theme-label');
 const filterButtons = document.querySelectorAll('.btn-filter');
 
 let todos = loadTodos();
-let currentFilter = 'all';
+let currentFilter = loadFilter();
 let hasManualTheme = false;
 let currentTheme = 'light';
+
+// 讀取上次選擇的篩選條件，無效值會安全回退為全部。
+function loadFilter() {
+  const savedFilter = localStorage.getItem(FILTER_STORAGE_KEY);
+  return savedFilter === 'active' || savedFilter === 'completed'
+    ? savedFilter
+    : 'all';
+}
 
 // 從瀏覽器儲存空間讀取格式正確的待辦事項。
 function loadTodos() {
@@ -82,7 +92,7 @@ function render() {
   } else if (currentFilter === 'active') {
     emptyState.textContent = '太棒了，沒有未完成的待辦事項！';
   } else if (currentFilter === 'completed') {
-    emptyState.textContent = '目前沒有已完成的待辦事項。';
+    emptyState.textContent = '目前沒有已完成的待辦事項；項目仍保留，只是不符合篩選條件。';
   }
 
   filterButtons.forEach((button) => {
@@ -92,6 +102,8 @@ function render() {
   });
 
   remainingCount.textContent = `未完成:${todos.filter((todo) => !todo.completed).length} 項`;
+  const completedCount = todos.filter((todo) => todo.completed).length;
+  clearCompletedButton.hidden = completedCount === 0;
 }
 
 // 套用指定主題，並同步更新切換按鈕。
@@ -144,6 +156,7 @@ function createId() {
 filterButtons.forEach((button) => {
   button.addEventListener('click', () => {
     currentFilter = button.dataset.filter;
+    localStorage.setItem(FILTER_STORAGE_KEY, currentFilter);
     render();
   });
 });
@@ -188,6 +201,19 @@ list.addEventListener('click', (event) => {
   if (!item) return;
 
   todos = todos.filter((todo) => todo.id !== item.dataset.id);
+  saveTodos();
+  render();
+});
+
+clearCompletedButton.addEventListener('click', () => {
+  const completedCount = todos.filter((todo) => todo.completed).length;
+  if (completedCount === 0) return;
+
+  if (!window.confirm(`確定要清除全部 ${completedCount} 筆已完成的事項嗎？此操作無法復原。`)) {
+    return;
+  }
+
+  todos = todos.filter((todo) => !todo.completed);
   saveTodos();
   render();
 });

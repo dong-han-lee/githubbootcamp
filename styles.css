@@ -251,6 +251,35 @@ h1 {
   text-align: center;
 }
 
+.app-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.btn-clear-completed {
+  padding: 7px 10px;
+  color: var(--danger);
+  background: var(--surface-alt);
+  border: 1px solid var(--danger);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-clear-completed:hover {
+  background: var(--danger-soft);
+}
+
+.btn-clear-completed:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+#clear-completed[hidden] {
+  display: none;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
