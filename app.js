@@ -82,7 +82,7 @@ function render() {
   } else if (currentFilter === 'active') {
     emptyState.textContent = '太棒了，沒有未完成的待辦事項！';
   } else if (currentFilter === 'completed') {
-    emptyState.textContent = '目前沒有已完成的待辦事項。';
+    emptyState.textContent = '目前沒有已完成的待辦事項；項目仍保留，只是不符合篩選條件。';
   }
 
   filterButtons.forEach((button) => {
