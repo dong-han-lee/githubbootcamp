@@ -1,5 +1,6 @@
 const STORAGE_KEY = 'todo-list-items';
 const THEME_STORAGE_KEY = 'todo-list-theme';
+const FILTER_STORAGE_KEY = 'todo-list-filter';
 
 const form = document.getElementById('todo-form');
 const input = document.getElementById('todo-input');
@@ -12,9 +13,17 @@ const themeLabel = document.getElementById('theme-label');
 const filterButtons = document.querySelectorAll('.btn-filter');
 
 let todos = loadTodos();
-let currentFilter = 'all';
+let currentFilter = loadFilter();
 let hasManualTheme = false;
 let currentTheme = 'light';
+
+// 讀取上次選擇的篩選條件，無效值會安全回退為全部。
+function loadFilter() {
+  const savedFilter = localStorage.getItem(FILTER_STORAGE_KEY);
+  return savedFilter === 'active' || savedFilter === 'completed'
+    ? savedFilter
+    : 'all';
+}
 
 // 從瀏覽器儲存空間讀取格式正確的待辦事項。
 function loadTodos() {
@@ -144,6 +153,7 @@ function createId() {
 filterButtons.forEach((button) => {
   button.addEventListener('click', () => {
     currentFilter = button.dataset.filter;
+    localStorage.setItem(FILTER_STORAGE_KEY, currentFilter);
     render();
   });
 });
